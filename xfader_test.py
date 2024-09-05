@@ -5,7 +5,6 @@
 # pydub (the module) is throwing warnings 
 ########################################################################
 
-
 import pytest
 import xfader 
 import numpy
