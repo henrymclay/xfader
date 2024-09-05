@@ -21,12 +21,12 @@ from pydub.playback import play
 # expects 44.1khz 16 bit wavs for now
 ##########################################################################
 
-def sample_import(path, format="wav"):
+def sample_import(path):
     sample = AudioSegment.from_wav(path)
     return sample
 
-def sample_export(sample, path, output_format="wav"):
-    output = sample.export(path, format=output_format)
+def sample_export(sample, path):
+    output = sample.export(path, "wav")
     return output
 
 
@@ -82,7 +82,7 @@ def main():
             #add: re-pitching 
             pitched_sample = repitch(sample, in_bpm, out_bpm)
             #e.g. think4.wav -> think4_160.wav
-            newname = file[:(file.find(".wav"))] + "_" + str(bpm) 
+            newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) 
 
             output = sample_export(pitched_sample, newname)
             print(newname + " exported")
