@@ -7,39 +7,26 @@
 
 # TODO
 # better error messages
-# real functions
-# figure out how to change sample pitch
-
+# bpm detection
+# test coverage ******
 
 import sys
 import ffmpeg
-
 from pydub import AudioSegment
+from pydub.playback import play
 
 ##########################################################################
-# : sample import function
+# : sample import + export functions
 # takes wav file and gets AudioSegment for pydub. 
 # expects 44.1khz 16 bit wavs for now
 ##########################################################################
 
 def sample_import(path, format="wav"):
-    
     sample = AudioSegment.from_wav(path)
-
     return sample
 
-
-
-##########################################################################
-# : sample import function
-# takes wav file and gets AudioSegment for pydub. 
-# expects 44.1khz 16 bit wavs for now
-##########################################################################dwa
-
-def sample_export(path, sample, output_format="wav"):
-    
+def sample_export(sample, path, output_format="wav"):
     output = sample.export(path, format=output_format)
-
     return output
 
 
@@ -56,17 +43,18 @@ def bpm_detect(sample_file, quarters=4):
 
 ##########################################################################
 # : re-pitching function
-# takes a bpm target and a loop file to re-pitch to hit that target 
-# detects bpm of the loop 
-#
+# calculates the ratio between starting and target bpm, then resamples at 
+# that sample rate. returns the pitched (up or down) segment
 ##########################################################################
 
-def repitch(out_tempo, in_file):
+    
+def repitch(in_tempo, out_tempo, in_segment):
+    bpm_ratio = out_tempo / in_tempo
+    new_sample_rate = int(in_segment.frame_rate * bpm_ratio)
+    pitched_segment = in_segment._spawn(in_segment.raw_data, overrides={'frame_rate': new_sample_rate})
+    pitched_segment = pitched_segment.set_frame_rate(44100)
 
-    in_tempo = bpm_detect(in_file)
-
-    out_file = in_file
-    return out_file
+    return pitched_segment
 
 
 
@@ -78,39 +66,30 @@ def repitch(out_tempo, in_file):
 ##########################################################################
 
 def main():
-
-    #input validation here - gotta pass file and bpm and nothing else!
-
-    if len(sys.argv) > 2:
-        print("bad args")
-        print("expected: 'xfader [bpm] [file]' ")
-        exit
-    elif len(sys.argv) < 2:
-        print("bad args")
-        print("expected: 'xfader [bpm] [file]' ")
-        exit
-    elif len(sys.argv) == 2:
+    if len(sys.argv) == 3:
         print("xfading...")
-        bpm = sys.argv[0]
-        file = sys.argv[1]
+        file = sys.argv[0]
+        in_bpm = sys.argv[1]
+        out_bpm = sys.argv[2]
 
-        if not bpm.isnumeric():
+        if (not in_bpm.isnumeric()) or (not out_bpm.isnumeric()):
             print("bpm must be a number")
             exit
         else:
             #input validation for sample file here 
             sample = sample_import(file)
-            newname = file[:(file.find(".wav"))] + str(bpm)
+            #add: bpm detection
+            #add: re-pitching 
+            pitched_sample = repitch(sample, in_bpm, out_bpm)
+            #e.g. think4.wav -> think4_160.wav
+            newname = file[:(file.find(".wav"))] + "_" + str(bpm) 
 
-            output = sample_export(sample, newname)
-            print("newname exported")
+            output = sample_export(pitched_sample, newname)
+            print(newname + " exported")
             exit
-
-        # output = repitch(bpm, sample)
-
-        exit
     else:
-        print("main error")
+        print("bad args")
+        print("expected: 'xfader [path/to/file] [in bpm] [out_bpm]' ")
         exit
 
 if __name__ == "__main__":
