@@ -2,16 +2,9 @@
 # unit tests for xfader.yp
 # by: Henry Clay
 # using pytest
-# pydub (the module) is throwing warnings and something cares about numpy
-# but I'm not sure what. my code seems okay though
+# pydub (the module) is throwing warnings 
 ########################################################################
 
-
-########################################################################
-#
-#
-#
-########################################################################
 
 import pytest
 import xfader 
