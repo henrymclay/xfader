@@ -12,6 +12,7 @@
 
 import sys
 import ffmpeg
+import librosa
 from pydub import AudioSegment
 from pydub.playback import play
 
@@ -33,12 +34,19 @@ def sample_export(sample, path):
 ##########################################################################
 # : beat detection function
 # detects the bpm of a sample based on peaks 
-# expects a single measure of 4/4
-# can be modified by suppliying 
+# librosa implementation almost from the docs 
+# beat_frames will be nice to have when I get DTW going 
 ##########################################################################
 
 def bpm_detect(sample_file, quarters=4):
-    bpm = 160
+    audio, rate = librosa.load(sample_file)
+    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate, hop_length = 4096,  trim = False )
+    bpm = tempo[0] # this seems to be a one member array...
+    if bpm > 160: 
+        bpm /= 2
+    if bpm < 80:
+        bpm *= 2
+    bpm = round(bpm)
     return bpm
 
 ##########################################################################

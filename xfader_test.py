@@ -30,14 +30,25 @@ def play_test():
 
 def import_export_test():
     sample = xfader.sample_import('./test_data/James_Brown_-_Funky_President.wav')
-    pitched = xfader.repitch(106, 160, sample)
-    xfader.sample_export(pitched, './test_data/James_Brown_-_Funky_President160.wav')
+    pitched = xfader.repitch(104, 160, sample)
+    xfader.sample_export(pitched, './test_data/Funky_President160.wav')
     sample_2 = xfader.sample_import('./test_data/James_Brown_-_Funky_President160.wav')
     assert(pitched == sample_2)
-    play(sample)
-    play(pitched)
-    play(sample_2)
 
+
+#######################################################################
+# bpm detection test 
+# tests bpm detection before + after repitch 
+#######################################################################
+
+def bpm_test1():
+    tempo1 = xfader.bpm_detect('./test_data/James_Brown_-_Funky_President.wav')
+    assert(tempo1 == 108)
+
+def bpm_test2():
+
+    tempo2 = xfader.bpm_detect('./test_data/Funky_President160.wav')
+    assert(tempo2 == 160)
 ########################################################################
 # TODO: 
 # import repitch export and compare to pre-rendered
@@ -50,3 +61,5 @@ def import_export_test():
 
 play_test()
 import_export_test()
+bpm_test1()
+bpm_test2()
