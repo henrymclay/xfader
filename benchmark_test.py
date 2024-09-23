@@ -31,41 +31,49 @@ def loop_break(audio):
 
 #import samples to test 
 
-amen1path = ".test_data/Amen1.wav"
-amen2path = ".test_data/Amen1.wav"
-amen4path = ".test_data/Amen1.wav"
-funky1path = ".test_data/Amen1.wav"
-funky2path = ".test_data/Amen1.wav"
-funky4path = ".test_data/Amen1.wav"
-amen512path = "./test_data/Amen512.wav"
-funky512path = "./test_data/Funky512.wav"
+amen1path = "./test_data/cutbreaks/Amen1.wav"
+amen2path = "./test_data/cutbreaks/Amen2.wav"
+amen4path = "./test_data/cutbreaks/Amen4.wav"
+funky1path = "./test_data/cutbreaks/Funky1.wav"
+funky2path = "./test_data/cutbreaks/Funky2.wav"
+funky4path = "./test_data/cutbreaks/Funky4.wav"
+amen_long_path = ".//test_data/cutbreaks/AmenLong.wav"
+funky_long_path = "./test_data/cutbreaks/FunkyLong.wav"
 
-break_paths = [amen1path, amen2path, amen4path, amen512path, funky1path, funky2path, funky4path, funky512path]
+break_paths = [amen1path, amen2path, amen4path, amen_long_path, funky1path, funky2path, funky4path, funky_long_path]
+#break_paths = [amen1path, amen2path, amen4path, funky1path, funky2path, funky4path]
 
 amen_bpm = 136
 funky_bpm = 96
 
-amen4 = xfader.sample_import(amen4path)
-funky4 = xfader.sample_import(funky4path) 
+amen1 = xfader.sample_import(amen1path)
+funky1 = xfader.sample_import(funky1path) 
 
-#concats audio, loops 10 times
-amen_long = amen4
-for x in range(128):
-    amen_long += amen4
+#concats audio
+amen_long = amen1 + amen1
+funky_long = funky1 + funky1
 
-funky_long = funky4
-for x in range(128):
-    funky_long += funky4
+amen_long += amen_long
+funky_long += funky_long
 
-xfader.sample_export(amen_long, amen512path)
-xfader.sample_export(funky_long, funky512path)
+xfader.sample_export(amen_long, amen_long_path)
+xfader.sample_export(funky_long, funky_long_path)
 
+print("Expected: Amen 138, Funky 101")
 
 for path in break_paths:
     tempo = xfader.bpm_detect(path)
     print(path, str(":"), str(tempo))
 
 
+"""
+my takeaway here is that it really likes loops of 4 bars with windows of 32nds, or 1/8ths of the sample. 
+I didn't get good results with 1 bar. Looping 1 bar to 4 seems to work, and 2 bars is ideal. I did get a half-tempo
+error w/ the Amen but it's "right". 
+
+If I window it at 80-150bpm, then I can start doing things like inferring # of bars based on samples 
+And thats an easy correction
+"""
 
 
 

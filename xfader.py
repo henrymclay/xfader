@@ -38,13 +38,15 @@ def sample_export(sample, path):
 # beat_frames will be nice to have when I get DTW going 
 ##########################################################################
 
-def bpm_detect(sample_file, quarters=4):
+def bpm_detect(sample_file):
     audio, rate = librosa.load(sample_file)
-    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate, hop_length = 4096,  trim = False )
+    # figure out hop length: 1/32nd of sample duration
+    hop = int(librosa.get_duration(y = audio) * rate / 32)
+    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate, hop_length = hop)
     bpm = tempo[0] # this seems to be a one member array...
-    if bpm > 160: 
+    if bpm > 150:
         bpm /= 2
-    if bpm < 80:
+    elif bpm < 80:
         bpm *= 2
     bpm = round(bpm)
     return bpm
