@@ -11,6 +11,7 @@
 # test coverage ******
 
 import sys
+import os
 import ffmpeg
 import librosa
 from pydub import AudioSegment
@@ -47,10 +48,8 @@ def sample_export(sample, path):
 
 def ad_prep(segment, hz = 500, length = 120000): 
     ad = segment.low_pass_filter(hz)
-    #ad = ad.set_frame_rate(1000)
     while len(ad) < length :
         ad += ad
-
     return ad
 
 
@@ -84,6 +83,18 @@ def repitch(in_tempo, out_tempo, in_segment):
     return pitched_segment
 
 
+##########################################################################
+# get_tempo : 
+# wrapper for bpm detection that does the loading buffering deleting  
+##########################################################################
+
+def get_tempo(sample):
+    loop = ad_prep(sample)
+    sample_export(loop, "./buffer/loop.wav")
+    tempo = bpm_detect("./buffer/loop.wav")
+    if os.path.exists("./buffer/loop.wav"):
+        os.remove("./buffer/loop.wav")
+    return tempo
 
 ##########################################################################
 # main: the main function
@@ -93,30 +104,28 @@ def repitch(in_tempo, out_tempo, in_segment):
 ##########################################################################
 
 def main():
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 2:
         print("xfading...")
         file = sys.argv[0]
-        in_bpm = sys.argv[1]
-        out_bpm = sys.argv[2]
+        out_bpm = sys.argv[1]
 
-        if (not in_bpm.isnumeric()) or (not out_bpm.isnumeric()):
+        if  not out_bpm.isnumeric():
             print("bpm must be a number")
             exit
         else:
-            #input validation for sample file here 
-            sample = sample_import(file)
-            #add: bpm detection
+            #input validation for sample file needed... 
+            loop = sample_import(file)
+            tempo = get_tempo(loop)
             #add: re-pitching 
-            pitched_sample = repitch(sample, in_bpm, out_bpm)
+            pitched_sample = repitch(loop, tempo, out_bpm)
             #e.g. think4.wav -> think4_160.wav
             newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) 
-
-            output = sample_export(pitched_sample, newname)
+            sample_export(pitched_sample, newname)
             print(newname + " exported")
             exit
     else:
         print("bad args")
-        print("expected: 'xfader [path/to/file] [in bpm] [out_bpm]' ")
+        print("expected: 'xfader [path/to/file] [out_bpm]' ")
         exit
 
 if __name__ == "__main__":
