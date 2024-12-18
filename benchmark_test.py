@@ -73,7 +73,16 @@ error w/ the Amen but it's "right".
 
 If I window it at 80-150bpm, then I can start doing things like inferring # of bars based on samples 
 And thats an easy correction
+
+I need to check slicing @ 50% or 25% too 
+
+
+TODO: 
+- write test coverage? 
+- make test cases - 10, 20, 50, 100 eventually 
+
 """
+
 
 
 
