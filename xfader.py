@@ -36,13 +36,10 @@ def sample_export(sample, path):
 # to be analyzed. The goal is to make it into a more song-like form as that 
 # is what our bpm detection algorithm expects. 
 # Also, going to cut at 500hz in order to isolate the fundamentals of
-# kick/snare/etc and eliminate noise + extraneous percussion and try
-# downsampling to do the same + save buffer space 
+# kick/snare/etc and eliminate noise + extraneous percussion
 # this means: 
-# 
 # - looping
 # - filtering
-# - downsampling 
 # hz is hertz of filter frequency, length is length of "song" in ms
 ##########################################################################
 
@@ -52,9 +49,8 @@ def ad_prep(segment, hz = 500, length = 120000):
         ad += ad
     return ad
 
-
 ##########################################################################
-# : beat detection function
+# bpm_detect(file): beat detection function
 # detects the bpm of a sample based on peaks 
 # librosa implementation almost from the docs 
 # beat_frames will be nice to have when I get DTW going 
@@ -68,7 +64,7 @@ def bpm_detect(sample_file):
     return bpm
 
 ##########################################################################
-# : re-pitching function
+# repitch(bpm, bpm, segment): re-pitching function
 # calculates the ratio between starting and target bpm, then resamples at 
 # that sample rate. returns the pitched (up or down) segment
 ##########################################################################
@@ -79,21 +75,19 @@ def repitch(in_tempo, out_tempo, in_segment):
     new_sample_rate = int(in_segment.frame_rate * bpm_ratio)
     pitched_segment = in_segment._spawn(in_segment.raw_data, overrides={'frame_rate': new_sample_rate})
     pitched_segment = pitched_segment.set_frame_rate(44100)
-
     return pitched_segment
 
-
 ##########################################################################
-# get_tempo : 
+# get_tempo(segment) : 
 # wrapper for bpm detection that does the loading buffering deleting  
 ##########################################################################
 
 def get_tempo(sample):
     loop = ad_prep(sample)
-    sample_export(loop, "./buffer/loop.wav")
-    tempo = bpm_detect("./buffer/loop.wav")
-    if os.path.exists("./buffer/loop.wav"):
-        os.remove("./buffer/loop.wav")
+    sample_export(loop, "./loop.wav")
+    tempo = bpm_detect("./loop.wav")
+    if os.path.exists("./loop.wav"):
+        os.remove("./loop.wav")
     return tempo
 
 ##########################################################################

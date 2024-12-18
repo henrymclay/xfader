@@ -1,6 +1,6 @@
 #########################################################################
 # Benchmarking for Python BPM detection algorithm 
-#
+# OUTDATED WE SOLVED THIS PROBLEM
 # by H. Clay 
 # 2024
 #########################################################################
@@ -37,7 +37,7 @@ amen4path = "./test_data/cutbreaks/Amen4.wav"
 funky1path = "./test_data/cutbreaks/Funky1.wav"
 funky2path = "./test_data/cutbreaks/Funky2.wav"
 funky4path = "./test_data/cutbreaks/Funky4.wav"
-amen_long_path = ".//test_data/cutbreaks/AmenLong.wav"
+amen_long_path = "./test_data/cutbreaks/AmenLong.wav"
 funky_long_path = "./test_data/cutbreaks/FunkyLong.wav"
 
 break_paths = [amen1path, amen2path, amen4path, amen_long_path, funky1path, funky2path, funky4path, funky_long_path]
