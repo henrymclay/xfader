@@ -17,8 +17,8 @@ from pydub import AudioSegment
 from pydub.playback import play
 
 ##########################################################################
-# : sample import + export functions
-# takes wav file and gets AudioSegment for pydub. 
+# sample_import(path) / sample_export(path) : sample import + export 
+# takes wav file  (at provided path) and gets AudioSegment for pydub. 
 # expects 44.1khz 16 bit wavs for now
 ##########################################################################
 
@@ -30,6 +30,29 @@ def sample_export(sample, path):
     output = sample.export(path, "wav")
     return output
 
+##########################################################################
+# ad_prep(segment) : takes audio data (pydub AudioSegment) and prepares it 
+# to be analyzed. The goal is to make it into a more song-like form as that 
+# is what our bpm detection algorithm expects. 
+# Also, going to cut at 500hz in order to isolate the fundamentals of
+# kick/snare/etc and eliminate noise + extraneous percussion and try
+# downsampling to do the same + save buffer space 
+# this means: 
+# 
+# - looping
+# - filtering
+# - downsampling 
+# hz is hertz of filter frequency, length is length of "song" in ms
+##########################################################################
+
+def ad_prep(segment, hz = 500, length = 120000): 
+    ad = segment.low_pass_filter(hz)
+    #ad = ad.set_frame_rate(1000)
+    while len(ad) < length :
+        ad += ad
+
+    return ad
+
 
 ##########################################################################
 # : beat detection function
@@ -40,14 +63,8 @@ def sample_export(sample, path):
 
 def bpm_detect(sample_file):
     audio, rate = librosa.load(sample_file)
-    # figure out hop length: 1/32nd of sample duration
-    hop = int(librosa.get_duration(y = audio) * rate / 32)
-    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate, hop_length = hop)
+    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate)
     bpm = tempo[0] # this seems to be a one member array...
-    if bpm > 150:
-        bpm /= 2
-    elif bpm < 80:
-        bpm *= 2
     bpm = round(bpm)
     return bpm
 
