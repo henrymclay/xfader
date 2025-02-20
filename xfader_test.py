@@ -1,8 +1,7 @@
 ########################################################################
-# unit tests for xfader.yp
+# tests for xfader.py
 # by: Henry Clay
 # using pytest
-# pydub (the module) is throwing warnings 
 ########################################################################
 
 import pytest

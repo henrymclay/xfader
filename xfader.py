@@ -43,11 +43,13 @@ def sample_export(sample, path):
 # hz is hertz of filter frequency, length is length of "song" in ms
 ##########################################################################
 
-def ad_prep(segment, hz = 500, length = 120000): 
+def ad_prep(segment, hz = 500, length = 30000): 
     ad = segment.low_pass_filter(hz)
+    count = 0
     while len(ad) < length :
         ad += ad
-    return ad
+        count += 1
+    return ad, count
 
 ##########################################################################
 # bpm_detect(file): beat detection function
@@ -56,9 +58,10 @@ def ad_prep(segment, hz = 500, length = 120000):
 # beat_frames will be nice to have when I get DTW going 
 ##########################################################################
 
-def bpm_detect(sample_file):
+def bpm_detect(sample_file, count):
     audio, rate = librosa.load(sample_file)
-    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate)
+    hop = round(rate * len(sample_file) * 1/count * 1/4096) # hop length of 64ths of original 
+    tempo, beat_frames = librosa.beat.beat_track(y=audio, sr=rate, hop_length=hop)
     bpm = tempo[0] # this seems to be a one member array...
     bpm = round(bpm)
     return bpm
@@ -80,12 +83,15 @@ def repitch(in_tempo, out_tempo, in_segment):
 ##########################################################################
 # get_tempo(segment) : 
 # wrapper for bpm detection that does the loading buffering deleting  
+# it is very clunky to bounce the wav and then re-load it but that's what
+# the modules prefer
 ##########################################################################
 
 def get_tempo(sample):
-    loop = ad_prep(sample)
+    loop, count = ad_prep(sample)
     sample_export(loop, "./loop.wav")
-    tempo = bpm_detect("./loop.wav")
+    #bounce = sample_import("./loop.wav")
+    tempo = bpm_detect("./loop.wav", count)
     if os.path.exists("./loop.wav"):
         os.remove("./loop.wav")
     return tempo
