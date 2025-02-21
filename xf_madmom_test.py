@@ -19,16 +19,18 @@ from pydub.playback import play
 
 def test_madmom(wav):
     # Use madmom's BeatTrackingProcessor to estimate the BPM
-    bpm = madmom.features.beats.BeatTrackingProcessor(madmom.features.beats.RNNBeatProcessor()(wav))
+    proc = madmom.features.tempo.TempoEstimationProcessor(min_bpm=70.0, max_bpm=150.0)
+    act = madmom.features.beats.RNNBeatProcessor()(wav)
+    bpm = proc(act)
 
     return bpm
 
 def bpm_test_runner(path):
-    directory = os.listdir(path)
+    dir = os.listdir(path)
 
-    for filename in directory:
-        file = path + filename
-        tempo = test_madmom(file)
+    for filename in dir:
+        wav = path + filename
+        tempo = test_madmom(wav)
         print(filename, str(":"), str(tempo))
     return
 
