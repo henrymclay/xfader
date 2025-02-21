@@ -16,3 +16,4 @@ Eventually, the functionalities will be expanded including:
 
 and many more!
 
+source bin/activate to start venv (essential!)

@@ -1,4 +1,4 @@
-#!/Users/clayh/projects/xfader/xfader/bin/python3.12
+#!/Users/clayh/projects/xfader/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

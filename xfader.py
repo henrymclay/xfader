@@ -14,6 +14,7 @@ import sys
 import os
 import ffmpeg
 import librosa
+
 from pydub import AudioSegment
 from pydub.playback import play
 
@@ -104,10 +105,10 @@ def get_tempo(sample):
 ##########################################################################
 
 def main():
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 3:
         print("xfading...")
-        file = sys.argv[0]
-        out_bpm = sys.argv[1]
+        file = sys.argv[1]
+        out_bpm = sys.argv[2]
 
         if  not out_bpm.isnumeric():
             print("bpm must be a number")
