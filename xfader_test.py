@@ -7,7 +7,8 @@
 import pytest
 import xfader 
 import numpy
-from pydub import AudioSegment 
+
+from pydub import AudioSegment
 from pydub.playback import play
 
 ########################################################################
@@ -61,7 +62,7 @@ def ad_prep_test():
     xfader.sample_export(song_test, './test_data/crunch/long_test.wav')
     long_test = xfader.sample_import('./test_data/crunch/long_test.wav')
     assert(len(long_test) > 120000)
-    #play(long_test)
+    #pydub.playback.play(long_test)
 
 
 ######################################################################
@@ -88,8 +89,8 @@ def filter_bpm_test():
 ########################################################################
 
 #ad_prep_test()
-filter_bpm_test()
-#play_test()
+#filter_bpm_test()
+play_test()
 #import_export_test()
 #bpm_test1()
 #bpm_test2()
