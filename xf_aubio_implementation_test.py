@@ -9,6 +9,7 @@
 import pytest
 import xfader 
 import numpy
+import aubio
 from pydub import AudioSegment 
 from pydub.playback import play
 
