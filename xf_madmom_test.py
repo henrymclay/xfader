@@ -19,7 +19,9 @@ from pydub.playback import play
 
 def test_madmom(wav):
     # Use madmom's BeatTrackingProcessor to estimate the BPM
-    proc = madmom.features.tempo.TempoEstimationProcessor(min_bpm=70.0, max_bpm=150.0)
+    # needs fps parameter or it errors 
+    # not sure 100 is correct
+    proc = madmom.features.tempo.TempoEstimationProcessor(fps=100)
     act = madmom.features.beats.RNNBeatProcessor()(wav)
     bpm = proc(act)
 
