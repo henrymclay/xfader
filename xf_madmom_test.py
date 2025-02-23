@@ -36,6 +36,10 @@ def bpm_test_runner(path):
         wav = path + filename
         tempo_list = test_madmom(wav)
         tempo = int(tempo_list[0][0])
+        if tempo > 160 : 
+            tempo = tempo / 2
+        elif tempo < 70 : 
+            tempo = tempo * 2
         print(filename, str(":"), str(tempo))
     return
 
