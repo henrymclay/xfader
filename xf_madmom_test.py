@@ -23,6 +23,8 @@ def test_madmom(wav):
     # not sure 100 is correct
     proc = madmom.features.tempo.TempoEstimationProcessor(fps=100)
     act = madmom.features.beats.RNNBeatProcessor()(wav)
+    # this is returning a list, not an int
+
     bpm = proc(act)
 
     return bpm
@@ -32,7 +34,8 @@ def bpm_test_runner(path):
 
     for filename in dir:
         wav = path + filename
-        tempo = test_madmom(wav)
+        tempo_list = test_madmom(wav)
+        tempo = int(tempo_list[0][0])
         print(filename, str(":"), str(tempo))
     return
 
