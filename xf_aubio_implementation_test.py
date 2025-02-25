@@ -17,11 +17,6 @@ from numpy import median, diff
 
 #this is basically out of the examples from the docs
 def get_file_bpm(path):
-    """ Calculate the beats per minute (bpm) of a given file.
-        path: path to the file
-        param: dictionary of parameters
-    """
-
     # default:
     samplerate, win_s, hop_s = 44100, 1024, 512
 
