@@ -16,4 +16,14 @@ Eventually, the functionalities will be expanded including:
 
 and many more!
 
+cheat sheet: 
 source bin/activate to start venv (essential!)
+
+aubio has its own repo and doesn't like being a submodule, it's in git ignore 
+needs to be downloaded, built from source (cd aubio; make), then installed through pip with cd aubio; pip install -v . 
+
+----- 
+v0.0.1 notes
+
+Madmom significantly outperforms Aubio and Librosa 
+Worth the set up tasks 
