@@ -28,7 +28,7 @@ def sample_import(path):
     sample = AudioSegment.from_wav(path)
     return sample
 
-def sample_export(sample, path):
+def sample_export(sample:AudioSegment, path):
     output = sample.export(path, "wav")
     return output
 
@@ -116,7 +116,7 @@ def main():
             out_bpm = int(out_bpm)
             pitched_sample = repitch(in_sample, tempo, out_bpm)
             # generate new name e.g. think4.wav -> think4_160.wav, export
-            newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) 
+            newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) + ".wav"
             sample_export(pitched_sample, newname) 
             print(newname + " exported")
             exit
