@@ -3,7 +3,7 @@
 # by: Henry Clay
 # using pytest
 # alternate approach using an algorithm from madmom library 
-# leverages LLM 
+# leverages ML model 
 # not positive about deploying compactly 
 # so unless it really works and the others don't...
 # I'm not sure its the way
