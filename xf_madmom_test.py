@@ -1,12 +1,7 @@
 ########################################################################
 # tests for xfader.py
 # by: Henry Clay
-# using pytest
-# alternate approach using an algorithm from madmom library 
-# leverages ML model 
-# not positive about deploying compactly 
-# so unless it really works and the others don't...
-# I'm not sure its the way
+# researching madmom implementation. this works and is ported to the main
 ########################################################################
 
 import pytest

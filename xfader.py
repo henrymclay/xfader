@@ -1,14 +1,11 @@
+#!
+
 #########################################################################
 # xfader - an audio sample manipulation and crossfading utility
-# but v 0.0.1 is just a sample repitcher 
+# v 0.0.2: takes a target and a bpm and re-pitches + exports at that bpm 
 # by H. Clay 
 # 2024
 #########################################################################
-
-# TODO
-# better error messages
-# bpm detection
-# test coverage ******
 
 import sys
 import os
@@ -31,26 +28,6 @@ def sample_import(path):
 def sample_export(sample:AudioSegment, path):
     output = sample.export(path, "wav")
     return output
-
-##########################################################################
-# ad_prep(AudioSegment, hz: int, length:int) : takes audio data (pydub AudioSegment) and prepares it 
-# to be analyzed. The goal is to make it into a more song-like form as that 
-# is what our bpm detection algorithm expects. 
-# Also, going to cut at 500hz in order to isolate the fundamentals of
-# kick/snare/etc and eliminate noise + extraneous percussion
-# this means: 
-# - looping
-# - filtering
-# hz is hertz of filter frequency, length is length of "song" in ms
-##########################################################################
-
-def ad_prep(segment, hz = 500, length = 30000): 
-    ad = segment.low_pass_filter(hz)
-    count = 0
-    while len(ad) < length :
-        ad += ad
-        count += 1
-    return ad, count
 
 ##########################################################################
 # bpm_detect(file path, int (default), int (default)): beat detection function
@@ -79,23 +56,24 @@ def bpm_detect(wav, tempo_min = 70, tempo_max = 160):
     return tempo
 
 ##########################################################################
-# repitch(AudioSegment, bpm, bpm): re-pitching function
+# repitch(AudioSegment, int, int, int): re-pitching function
 # calculates the ratio between starting and target bpm, then resamples at 
 # that sample rate. returns the pitched (up or down) segment
 ##########################################################################
 
-def repitch(in_segment, in_tempo, out_tempo):
+def repitch(in_segment, in_tempo, out_tempo, out_rate = 44100):
+    # start it out by getting the ratio of old to new bpm and use it to generate the new sample rate
     bpm_ratio = out_tempo / in_tempo
     new_sample_rate = int(in_segment.frame_rate * bpm_ratio)
+    #resamples the original at the new rate, i.e. plays it faster, then converts new sample to 441khz 
     pitched_segment = in_segment._spawn(in_segment.raw_data, overrides={'frame_rate': new_sample_rate})
-    pitched_segment = pitched_segment.set_frame_rate(44100)
+    pitched_segment = pitched_segment.set_frame_rate(out_rate)
     return pitched_segment
 
 ##########################################################################
 # main: the main function
-# scolds about arguments if those are bad
-# the flow is: load samples in to process
-# beat + bpm detection 
+# takes a bpm and a path to a sample to manipulate
+# exports in the same folder
 ##########################################################################
 
 def main():
@@ -108,18 +86,38 @@ def main():
             print("bpm must be a number")
             exit
         else:
-            # input validation for sample file needed... 
-            # detect tempo using madmom then import into pydub
-            tempo = bpm_detect(file)
-            in_sample = sample_import(file)
-            # repitch
             out_bpm = int(out_bpm)
-            pitched_sample = repitch(in_sample, tempo, out_bpm)
-            # generate new name e.g. think4.wav -> think4_160.wav, export
-            newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) + ".wav"
-            sample_export(pitched_sample, newname) 
-            print(newname + " exported")
-            exit
+            if os.path.isdir(file):
+                dir = os.listdir(file)
+
+                for filename in dir:
+                    wavpath = file + filename
+                    # do the stuff - can I factor out the below? 
+                    tempo = bpm_detect(wavpath)
+                    in_sample = sample_import(wavpath)
+                    
+                    pitched_sample = repitch(in_sample, tempo, out_bpm)
+
+                    newname = wavpath[:(wavpath.find(".wav"))] + "_" + str(out_bpm) + ".wav"
+                    print(wavpath, str(":"), str(tempo))
+                    sample_export(pitched_sample, newname) 
+                    print(newname + " exported")
+                exit
+            elif os.path.isfile(file): 
+                # input validation for sample file needed... 
+                # detect tempo using madmom then import into pydub
+                tempo = bpm_detect(file)
+                in_sample = sample_import(file)
+                # repitch
+                pitched_sample = repitch(in_sample, tempo, out_bpm)
+                # generate new name e.g. think4.wav -> think4_160.wav, export
+                newname = file[:(file.find(".wav"))] + "_" + str(out_bpm) + ".wav"
+                sample_export(pitched_sample, newname) 
+                print(newname + " exported")
+                exit
+            else: 
+                print("bad path to file - this ia a weird one. make sure you provided the correct path")
+                exit
     else:
         print("bad args")
         print("expected: 'xfader [path/to/wav] [out_bpm]' ")
@@ -130,12 +128,14 @@ if __name__ == "__main__":
 
 
 """
-we need: 
+TODO: 
 
-main: 
-    input validation: file to change, target tempo     
-    - gets the file's bpm 
-    - - gets the file's expected vs actual length
-    - repitches the file to new bpm
+input validation 
+script header for bash
+file vs folder mode
+export to different folder
+new rename scheme
+----
+silence adder
 
 """
