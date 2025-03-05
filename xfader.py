@@ -71,6 +71,26 @@ def repitch(in_segment, in_tempo, out_tempo, out_rate = 44100):
     return pitched_segment
 
 ##########################################################################
+# imre2ex(): 
+# short for import repitch rename export. 
+# which is what it does! this is the central logic loop of 0.0.2, factored
+# out so the main is cleaner
+##########################################################################
+
+
+
+def imre2ex(wavpath, out_bpm):
+    # detects the bpm then imports as AudioSegment
+    tempo = bpm_detect(wavpath)
+    in_sample = sample_import(wavpath)
+    # repitches from detected to target bpm 
+    pitched_sample = repitch(in_sample, tempo, out_bpm)
+    # renames, e.g. think4.wav -> think4_160.wav, then exports
+    newname = wavpath[:(wavpath.find(".wav"))] + "_" + str(out_bpm) + ".wav"
+    sample_export(pitched_sample, newname) 
+    print(newname + " exported")
+
+##########################################################################
 # main: the main function
 # takes a bpm and a path to a sample to manipulate
 # exports in the same folder
@@ -85,6 +105,8 @@ def main():
         if not out_bpm.isnumeric():
             print("bpm must be a number")
             exit
+        elif not ( os.path.isfile(file) or os.path.isdir(file) ):
+            print("issues with the path - needs to be a 44.1khz .wav file or a directory")
         else:
             out_bpm = int(out_bpm)
             if os.path.isdir(file):
@@ -92,16 +114,16 @@ def main():
 
                 for filename in dir:
                     wavpath = file + filename
-                    # do the stuff - can I factor out the below? 
-                    tempo = bpm_detect(wavpath)
-                    in_sample = sample_import(wavpath)
-                    
-                    pitched_sample = repitch(in_sample, tempo, out_bpm)
-
-                    newname = wavpath[:(wavpath.find(".wav"))] + "_" + str(out_bpm) + ".wav"
-                    print(wavpath, str(":"), str(tempo))
-                    sample_export(pitched_sample, newname) 
-                    print(newname + " exported")
+                    if os.path.isdir(wavpath):
+                        print("skipped " + filename)
+                    elif filename
+                        # do the stuff - can I factor out the below? 
+                        tempo = bpm_detect(wavpath)
+                        in_sample = sample_import(wavpath)                    
+                        pitched_sample = repitch(in_sample, tempo, out_bpm)
+                        newname = wavpath[:(wavpath.find(".wav"))] + "_" + str(out_bpm) + ".wav"
+                        sample_export(pitched_sample, newname) 
+                        print(newname + " exported")
                 exit
             elif os.path.isfile(file): 
                 # input validation for sample file needed... 
