@@ -82,35 +82,40 @@ def main():
         file = sys.argv[1]
         out_bpm = sys.argv[2]
 
+        # we need bpm to be a number and file to be a wav or a path to a dir of wavs. 
+        #first, check number
         if not out_bpm.isnumeric():
             print("bpm must be a number")
             exit
-        elif not ( os.path.isfile(file) or os.path.isdir(file) ):
-            print("issues with the path - needs to be a 44.1khz .wav file or a directory")
-            exit
-        elif not file.endswith(".wav"):
+        # then, check that the path provided is either a .wav file or a directory. 
+        # 44.1khz warning has no software check yet, just a user reminder
+        # in light of the .wav check, isfile might be redundant
+        elif not ( (os.path.isfile(file) and file.endswith(".wav") ) or os.path.isdir(file) ):
             print("issues with the path - needs to be a 44.1khz .wav file or a directory")
             exit
         else:
+            # once we're sure we have a number and a .wav / dir...
             out_bpm = int(out_bpm)
+            # if directory
             if os.path.isdir(file):
                 dir = os.listdir(file)
-
                 for filename in dir:
                     if filename.endswith(".wav"):
-                        # do the stuff - can I factor out the below? 
                         wavpath = file + filename
+                        # detect tempo using madmom then import into pydub
                         tempo = bpm_detect(wavpath)
-                        in_sample = sample_import(wavpath)                    
+                        in_sample = sample_import(wavpath)       
+                        # repitch        
                         pitched_sample = repitch(in_sample, tempo, out_bpm)
+                        # generate new name e.g. think4.wav -> think4_160.wav, export
                         newname = wavpath[:(wavpath.find(".wav"))] + "_" + str(out_bpm) + ".wav"
                         sample_export(pitched_sample, newname) 
                         print(newname + " exported")
                     else: 
+                        # if it's not a wav, don't do it 
                         print("skipped " + filename) 
                 exit
             elif os.path.isfile(file): 
-                # input validation for sample file needed... 
                 # detect tempo using madmom then import into pydub
                 tempo = bpm_detect(file)
                 in_sample = sample_import(file)
@@ -124,6 +129,7 @@ def main():
             else: 
                 print("bad path to file - this ia a weird one. make sure you provided the correct path")
                 exit
+                #in practice this branch should never come up, if this error is occurring something strange is happening
     else:
         print("bad args")
         print("expected: 'xfader [path/to/wav] [out_bpm]' ")
@@ -135,8 +141,6 @@ if __name__ == "__main__":
 
 """
 TODO: 
-
-input validation 
 script header for bash
 file vs folder mode
 export to different folder
