@@ -46,50 +46,13 @@ def bpm_test1():
     assert(tempo1 == 108)
 
 def bpm_test2():
-
     tempo2 = xfader.bpm_detect('./test_data/Funky_President160.wav')
     assert(tempo2 == 160)
-
-######################################################################
-# ad_prep test 
-# checks that the audio is being processed correctly  
-# imports sample, runs the prep function (filters + loops), exports, re-imports and checks attrs of imported file
-######################################################################
-
-def ad_prep_test(): 
-    song_test = xfader.sample_import('./test_data/crunch/James_Brown_-_Funky_President.wav')
-    song_test = xfader.ad_prep(song_test)
-    xfader.sample_export(song_test, './test_data/crunch/long_test.wav')
-    long_test = xfader.sample_import('./test_data/crunch/long_test.wav')
-    assert(len(long_test) > 120000)
-    #pydub.playback.play(long_test)
-
-
-######################################################################
-# filter_bpm_test(): 
-# checks the bpm detection when using the filter->loop process
-######################################################################
-
-def filter_bpm_test(): 
-    loop = xfader.sample_import('./test_data/r2/Juice_-_Catch_A_Groove.2bar.108bpm.wav')
-    loop = xfader.ad_prep(loop)
-    xfader.sample_export(loop, './test_data/crunch/long_bpm_test.wav')
-    tempo = xfader.bpm_detect('./test_data/crunch/long_bpm_test.wav')
-    print(str("Expected: 108 Analyzed: "), str(tempo))
-    assert(tempo == 108)
-
-########################################################################
-# TODO: 
-# import repitch export and compare to pre-rendered
-# detection on known info
-########################################################################
 
 ########################################################################
 # tests get run here
 ########################################################################
 
-#ad_prep_test()
-#filter_bpm_test()
 play_test()
 #import_export_test()
 #bpm_test1()

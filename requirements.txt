@@ -1,5 +1,4 @@
 aiofiles==24.1.0
-aubio @ file:///Users/clayh/projects/xfader/aubio
 audioread==3.0.1
 certifi==2024.8.30
 cffi==1.17.1
