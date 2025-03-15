@@ -70,13 +70,32 @@ def repitch(in_segment, in_tempo, out_tempo, out_rate = 44100):
     pitched_segment = pitched_segment.set_frame_rate(out_rate)
     return pitched_segment
 
+
+def change_sr(old_sr, new_sr, path):
+    #import
+    # wrap below in recursion folder code
+    new_sample = new_sample.set_frame_rate(old_sr)
+    return
+
 ##########################################################################
 # main: the main function
-# takes a bpm and a path to a sample to manipulate
+# takes a path to a sample to manipulate and a bpm:
+# xfader [path] [bpm]
 # exports in the same folder
 ##########################################################################
 
 def main():
+    if sys.argv[1] == "convert":
+        if (sys.argv[2].isnumeric() and sys.argv[3].isnumeric() and len(sys.argv) == 5):
+            old_sr = sys.argv[2]
+            new_sr = sys.argv[3]
+            path = sys.argv[4]
+            change_sr(old_sr, new_sr, path)
+            print("resampled from ", str(sys.argv[2]), "to", str(sys.argv[3]) )
+            exit
+        else: 
+            print("usage: xfader convert [old sample rate] [new sample rate]")
+            exit
     if len(sys.argv) == 3:
         print("xfading...")
         file = sys.argv[1]
